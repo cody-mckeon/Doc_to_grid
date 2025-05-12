@@ -55,26 +55,19 @@ def extract_entries(tokens: List[str]) -> List[Tuple[int, int, str]]:
     
 def print_grid_from_doc(doc_url: str) -> None:
     """
-    Fetch, parse, and print a 2D grid of characters from a Google Doc table.
+    Fetch a Google Doc table of <x> <char> <y> entries and render a 2D grid.
 
-    The Doc is expected to export as plain text with:
-      • A header row: "x-coordinate", "Character", "y-coordinate"
-      • Then a flat sequence of cells: x, char, y, x, char, y, …
-
-    Parsing steps:
-      1) Split entire document on whitespace into tokens.
-      2) Discard the first three header tokens.
-      3) Every group of 3 tokens thereafter is (x, char, y).
-      4) Convert x and y to ints; collect (x, y, char) tuples.
-      5) Compute grid width = max_x+1, height = max_y+1.
-      6) Fill a 2D array of spaces, then place each char at (x, y).
-      7) Print each row joined as a string.
+    Steps:
+      1) Export the Doc to plain text via _convert_to_export_url.
+      2) Tokenize on whitespace and drop the first three header tokens.
+      3) Extract (x, y, char) tuples using extract_entries().
+      4) If no entries found and BeautifulSoup is available, parse the HTML table as fallback.
+      5) Compute grid dimensions and allocate a 2D list of spaces.
+      6) Place each character at grid[y][x].
+      7) Print rows from top down to form the secret message.
 
     Time Complexity: O(T + W·H)
-      • T = total number of tokens (~3N entries + header)
-      • W = width of grid, H = height of grid
-
-    Space Complexity: O(W·H) for the output grid
+    Space Complexity: O(W·H)
     """
     # Build export URL and fetch content
     export_url = _convert_to_export_url(doc_url)
