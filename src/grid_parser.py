@@ -44,7 +44,7 @@ def print_grid_from_doc(doc_url: str) -> None:
     response.raise_for_status()
 
     # 1) Turn the entire document into a flat list of tokens
-    tokens = re.split(r"\s+", resp.text.strip())
+    tokens = re.split(r"\s+", response.text.strip())
     # tokens[0:3] == ["x-coordinate","Character","y-coordinate"]
     data = tokens[3:]  # everything after the header
 
