@@ -3,15 +3,13 @@ import requests
 
 def _convert_to_export_url(doc_url: str) -> str:
     """
-    Convert a standard Google Doc URL to a plain-text export URL.
-    Example:
-      https://docs.google.com/document/d/<DOC_ID>/edit
-    => https://docs.google.com/document/d/<DOC_ID>/export?format=txt
+    Convert both “edit” and “pub” Google Doc URLs into a plain-text export URL.
     """
-    match = re.search(r"/d/([\w-]+)", doc_url)
-    if not match:
-        raise ValueError(f"Invalid Google Doc URL: {doc_url}")
-    doc_id = match.group(1)
+    # Match either /d/<ID>/ or /d/e/<ID>/
+    m = re.search(r"/d/(?:e/)?([\w-]+)", doc_url)
+    if not m:
+        raise ValueError(f"Couldn’t find a document ID in {doc_url!r}")
+    doc_id = m.group(1)
     return f"https://docs.google.com/document/d/{doc_id}/export?format=txt"
 
 
