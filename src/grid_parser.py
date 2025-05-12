@@ -78,8 +78,9 @@ def print_grid_from_doc(doc_url: str) -> None:
     for x, y, ch in entries:
         grid[y][x] = ch
 
-    for row in grid:
-        print("".join(row))
+    # Print from top row down to bottom
+    for row in range(height - 1, -1, -1):
+        print("".join(grid[row]))
 
 def debug_print_grid(doc_url: str):
     export_url = _convert_to_export_url(doc_url)
