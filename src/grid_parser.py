@@ -1,6 +1,12 @@
 import re
 import requests
 
+try:
+    from bs4 import BeautifulSoup
+except ImportError:
+    BeautifulSoup = None
+
+
 def _convert_to_export_url(doc_url: str) -> str:
     """
     Convert Google Doc URLs into a plain-text export URL.
@@ -79,13 +85,24 @@ def print_grid_from_doc(doc_url: str) -> None:
         else:
             i += 1
 
+    # Fallback: HTML table parsing
+    if (not entries or len(data) % 3 != 0) and BeautifulSoup:
+        soup = BeautifulSoup(text, 'html.parser')
+        table = soup.find('table')
+        if table:
+            cells = table.find_all(['th', 'td'])
+            tokens = [cell.get_text(strip=True) for cell in cells]
+            data = tokens[3:]
+            entries = extract_entries(data)
+
+
     # 3) Now you have entries!  Proceed as before:
     if not entries:
         print("❌ No entries found!")
         return
 
-    max_x = max(x for x, _, _ in entries)
-    max_y = max(y for _, y, _ in entries)
+    max_x = max(e[0] for e in entries)
+    max_y = max(e[1] for e in entries)
     width, height = max_x + 1, max_y + 1
 
     # 4) Build and print the grid
