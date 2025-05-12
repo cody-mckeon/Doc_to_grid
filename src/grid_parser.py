@@ -1,5 +1,6 @@
 import re
 import requests
+from typing import List, Tuple, Optional
 
 try:
     from bs4 import BeautifulSoup
