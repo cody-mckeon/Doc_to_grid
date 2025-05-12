@@ -63,3 +63,45 @@ def print_grid_from_doc(doc_url: str) -> None:
     # Print rows
     for row in grid:
         print("".join(row))
+
+def debug_print_grid(doc_url: str):
+    export_url = _convert_to_export_url(doc_url)
+    print(f"→ Export URL: {export_url}")
+    
+    resp = requests.get(export_url)
+    print(f"→ HTTP status: {resp.status_code}\n")
+    
+    lines = resp.text.splitlines()
+    print(f"→ Raw lines ({len(lines)}): {lines[:10]!r}\n")
+    
+    entries = []
+    for line in lines:
+        parts = line.strip().split()
+        if len(parts) != 3:
+            continue
+        c, xs, ys = parts
+        try:
+            x, y = int(xs), int(ys)
+            entries.append((x, y, c))
+        except ValueError:
+            continue
+    
+    print(f"→ Parsed entries: {len(entries)} (showing up to 10):")
+    print(entries[:10], "\n")
+    
+    if not entries:
+        print("❌ No valid char-coordinate entries found.")
+        return
+    
+    max_x = max(x for x,_,_ in entries)
+    max_y = max(y for _,y,_ in entries)
+    print(f"→ Grid size: {max_y+1} rows × {max_x+1} cols\n")
+    
+    grid = [[" "] * (max_x+1) for _ in range(max_y+1)]
+    for x, y, c in entries:
+        grid[y][x] = c
+    
+    print("→ Final grid:")
+    for row in grid:
+        print("".join(row))
+
