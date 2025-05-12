@@ -53,6 +53,19 @@ def print_grid_from_doc(doc_url: str) -> None:
     # tokens[0:3] == ["x-coordinate","Character","y-coordinate"]
     data = tokens[3:]  # everything after the header
 
+    #DEBUG # immediately after data = tokens[3:]
+    print(f"Total data tokens = {len(data)}")
+    print("First 50 tokens:", data[:50])
+    
+    # show exactly what your parser is seeing, and why it’s rejecting every triple
+    for idx in range(min(20, len(data) - 2)):
+        xs, ch, ys = data[idx], data[idx+1], data[idx+2]
+        is_x_int = xs.lstrip('-').isdigit()
+        is_y_int = ys.lstrip('-').isdigit()
+        is_char_single = len(ch) == 1
+        print(f"{idx:2d} → xs={xs!r} int?{is_x_int} | ch={ch!r} len?{len(ch)} | ys={ys!r} int?{is_y_int}")
+
+
     # 2) Sliding-window parse: int, single-char, int
     entries = []
     i = 0
