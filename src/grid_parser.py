@@ -53,6 +53,7 @@ def print_grid_from_doc(doc_url: str) -> None:
     export_url = _convert_to_export_url(doc_url)
     response = requests.get(export_url)
     response.raise_for_status()
+    text = response.text
 
     # 1) Turn the entire document into a flat list of tokens
     tokens = re.split(r"\s+", response.text.strip())
