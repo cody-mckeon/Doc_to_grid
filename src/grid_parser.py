@@ -53,11 +53,6 @@ def print_grid_from_doc(doc_url: str) -> None:
     # tokens[0:3] == ["x-coordinate","Character","y-coordinate"]
     data = tokens[3:]  # everything after the header
 
-    # sanity check
-    if len(data) % 3 != 0:
-        print(f"⚠️  Unexpected token count: {len(data)} is not a multiple of 3")
-        return
-
     # 2) Sliding-window parse: int, single-char, int
     entries = []
     i = 0
