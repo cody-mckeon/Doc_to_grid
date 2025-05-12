@@ -58,16 +58,18 @@ def print_grid_from_doc(doc_url: str) -> None:
         print(f"⚠️  Unexpected token count: {len(data)} is not a multiple of 3")
         return
 
-    # 2) Build entries = [(x,y,char), ...]
+    # 2) Sliding-window parse: int, single-char, int
     entries = []
-    for i in range(0, len(data), 3):
+    i = 0
+    N = len(data)
+    while i < N - 2:
         xs, ch, ys = data[i], data[i+1], data[i+2]
-        try:
+        if xs.lstrip('-').isdigit() and ys.lstrip('-').isdigit() and len(ch) == 1:
             x, y = int(xs), int(ys)
-        except ValueError:
-            print(f"⚠️  Couldn’t parse coords: {xs!r}, {ys!r}")
-            continue
-        entries.append((x, y, ch))
+            entries.append((x, y, ch))
+            i += 3
+        else:
+            i += 1
 
     # 3) Now you have entries!  Proceed as before:
     if not entries:
