@@ -25,7 +25,33 @@ def _convert_to_export_url(doc_url: str) -> str:
     doc_id = m.group(1)
     return f"https://docs.google.com/document/d/{doc_id}/export?format=txt"
 
+def extract_entries(tokens: List[str]) -> List[Tuple[int, int, str]]:
+    """
+    Scan through whitespace-delimited tokens and extract valid (x, y, char) triples.
 
+    A valid triple satisfies:
+      - tokens[i]    is an integer string (x)
+      - tokens[i+1]  is exactly one character (char)
+      - tokens[i+2]  is an integer string (y)
+
+    Args:
+        tokens: List of text tokens after dropping header cells.
+
+    Returns:
+        A list of tuples (x, y, char).
+    """
+    entries: List[Tuple[int, int, str]] = []
+    i = 0
+    n = len(tokens)
+    while i < n - 2:
+        xs, ch, ys = tokens[i], tokens[i+1], tokens[i+2]
+        if xs.lstrip('-').isdigit() and ys.lstrip('-').isdigit() and len(ch) == 1:
+            entries.append((int(xs), int(ys), ch))
+            i += 3
+        else:
+            i += 1
+    return entries
+    
 def print_grid_from_doc(doc_url: str) -> None:
     """
     Fetch, parse, and print a 2D grid of characters from a Google Doc table.
@@ -74,17 +100,7 @@ def print_grid_from_doc(doc_url: str) -> None:
 
 
     # 2) Sliding-window parse: int, single-char, int
-    entries = []
-    i = 0
-    N = len(data)
-    while i < N - 2:
-        xs, ch, ys = data[i], data[i+1], data[i+2]
-        if xs.lstrip('-').isdigit() and ys.lstrip('-').isdigit() and len(ch) == 1:
-            x, y = int(xs), int(ys)
-            entries.append((x, y, ch))
-            i += 3
-        else:
-            i += 1
+    entries = extract_entries(data)
 
     # Fallback: HTML table parsing
     if (not entries or len(data) % 3 != 0) and BeautifulSoup:
